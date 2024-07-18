@@ -1,5 +1,173 @@
-<html>
-  <body>
-    <p>Hey this is a test.</p>
-  </body>
-</html>
+<!DOCTYPE html> 
+<html> 
+
+<head>
+  <title>Per-Unit Price Calculator</title>
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+	<!-- For styling -->
+	<style> 
+		input[type="button"] { 
+			background-color: green; 
+			border: none; 
+			border-radius: 5px; 
+			color: white; 
+      display: block;
+		  font-family: "Tahoma", sans-serif;
+			font-size: 1.5em; 
+			font-weight: bold; 
+			margin: 0.6em auto;
+			padding: 20px 40px; 
+			width: 98%; 
+		} 
+		
+		input[type="button"]:disabled { 
+			background-color: #b7b7b7; 
+			box-shadow: none !important;
+			transform: none !important;
+    }
+		
+		input[type="button"]:active { 
+            transform: scale(0.99); 
+            box-shadow: -4px -4px #004200 inset;
+    } 
+
+		input[type="text"], label { 
+			border: none; 
+			border-radius: 5px; 
+			border: 2px solid black; 
+			font-size: 1.5em; 
+			font-weight: bold; 
+			padding: 20px 30px; 
+			width: inherit;
+		} 
+		
+		#wrapper { 
+			border: 1px solid black; 
+			margin-left: auto; 
+			margin-right: auto; 
+			max-width: 1024px;
+		} 
+		
+		.input-row {
+		  display: flex;
+		  margin: 1em 0;
+		  width: 100%;
+		}
+		
+		.result {
+		  font-family: "Tahoma", sans-serif;
+		  font-size: 1.5em;
+			margin: 10px;
+			padding: 20px 30px; 
+			border-radius: 5px; 
+			border: 2px solid #CCC; 
+		}
+		
+	  @media only screen and (max-width: 1024px) {
+	    body {
+        font-size: 1em;
+	    }
+	    
+      input[type="text"], label {
+        display: block;
+        margin: 0.2em auto;
+        text-align: center;
+      }
+      
+      .input-row {
+          display: block;
+          width: inherit;
+      }
+    }
+	</style> 
+</head> 
+	
+<body> 
+	
+	<!-- https://www.geeksforgeeks.org/javascript-calculator/ -->
+	<!-- Use Table to Create Calculator Structure Design -->
+	<div id="wrapper"> 
+		    <span class="input-row"><label for="price">Product Price</label>
+			  <input type="text" id="price"></span>
+			  
+		    <span class="input-row"><label for="unit">Total Product Units (kg, lbs, etc.)</label>
+			  <input type="text" id="unit"></span>
+			  
+			  <input type="button" id="btnCalc" value="Calculate" onclick="calc()" disabled/>
+			  <input type="button" value="Clear" onclick="clr()" />
+			  
+		    <p class="result" id="per-result"></p>
+		    <p class="result" id="100-result"></p>
+	</div> 
+
+	<script>
+	    calcBtn = document.getElementById("btnCalc");
+	    priceInput = document.getElementById("price");
+	    unitInput = document.getElementById("unit");
+	
+	    // Restrict an element to numbers up to 10 digits, plus optional decimal of 1-2 places
+	    function numRestrict(numElement) {
+        const nextVal = 
+          numElement.target.value.substring(0, numElement.target.selectionStart) +
+          (numElement.data ?? '') +
+          numElement.target.value.substring(numElement.target.selectionEnd)
+        ;
+        console.log(nextVal)
+        if(!/^(\d{0,10}|\d{0,10}\.?\d{0,2})$/.test(nextVal)) {
+            numElement.preventDefault();
+        }
+        return;
+    }
+    
+    // Reactivate calculate button only if both input fields aren't blank
+    function btnValidate(){
+		  let prodPrice = priceInput.value; 
+		  let prodUnits = unitInput.value; 
+		  
+      if(!prodPrice || !prodUnits){
+        calcBtn.disabled = true;
+      } else {
+        calcBtn.disabled = false;
+      }
+    }
+	
+	  // Apply number input restriction to price and unit inputs
+  	priceInput.addEventListener("beforeinput", function(e) {
+  	  numRestrict(e);
+  	 });
+  	unitInput.addEventListener("beforeinput", function(e) {
+  	  numRestrict(e);
+  	 });
+  	 
+  	// Apply button enabling check to price and unit inputs
+  	priceInput.addEventListener("input", btnValidate);
+    unitInput.addEventListener("input", btnValidate);
+	
+	
+		// Calculate per-unit price and return result 
+		function calc() { 
+		  let prodPrice = priceInput.value; 
+		  let prodUnits = unitInput.value; 
+		  
+		  if(!prodPrice || !prodUnits) { return; }
+		  
+			let perUnit = Math.round(prodPrice / prodUnits * 100) / 100;
+			
+			let unitHund = prodUnits / 100;
+			let per100 = Math.round(prodPrice / unitHund * 100) / 100;
+			
+			document.getElementById("per-result").innerHTML = "<b>" + perUnit + "</b> per <b>1</b> unit";
+			document.getElementById("100-result").innerHTML = "<b>" + per100 + "</b> per <b>100</b> units";
+		} 
+
+		// Clear all result displays and inputs
+		function clr() { 
+		  calcBtn.disabled = true;
+		  document.querySelectorAll(".result").forEach(e => e.innerHTML = "");
+			priceInput.value = "";
+			unitInput.value = "";
+		} 
+	</script> 
+</body> 
+
+</html> 
